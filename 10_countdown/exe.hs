@@ -55,10 +55,27 @@ Maybe instead proof property for all posible value we are going run rundom 100 t
 
 -- Expressing properties about programs and testing them with randomly-generated values.
 prop_revapp :: [Int] -> [Int] -> Bool
-prop_revapp xs ys = reverse (xs++ys) == reverse ys ++ reverse xs
+prop_revapp xs ys = reverse (xs++ys) == reverse xs ++ reverse ys
 -- Counter-example is 
 --          shrinking heuristic => the simples counter example
+--                                        => debugging our programs
 
+
+-- Combine functors
+-- let a = fmap (fst) [([2],[1,3,4]),([2,3],[1,4])]
+-- fmap (\f -> 1: f) a
+--      => Applicative functors
+
+-- f1 g (xs,ys) = (g xs,ys)
+-- fmap (f1 (1:)) [([1],[2,3,4]),([1,2],[3,4]),([1,2,3],[4])]
+-- fmap (\(xs,ys) -> (1:xs,ys) [([1],[2,3,4]),([1,2],[3,4]),([1,2,3],[4])]
+
+putFirst x = fmap (\(xs,ys) -> (x:xs,ys))
+
+prop_splitapp          :: Int -> [Int] -> Bool
+prop_splitapp x ys     = split' (x:ys) == putFirst x (split'(ys))
 
 main :: IO ()
-main = quickCheck prop_revapp
+main = do 
+            quickCheck prop_revapp
+            quickCheck prop_splitapp
