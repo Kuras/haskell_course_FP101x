@@ -75,7 +75,11 @@ putFirst x = fmap (\(xs,ys) -> (x:xs,ys))
 prop_splitapp          :: Int -> [Int] -> Bool
 prop_splitapp x ys     = split' (x:ys) == putFirst x (split'(ys))
 
+prop_splitapp'        :: [Int] -> Bool
+prop_splitapp' xs     = foldr (&&) True (map (\ tuple -> (fst tuple ++ snd tuple) == xs) (split' xs))
+
 main :: IO ()
 main = do 
             quickCheck prop_revapp
             quickCheck prop_splitapp
+            quickCheck prop_splitapp'
