@@ -204,3 +204,6 @@ solutions'' ns n                =
        , m == n]
        
 -- Whooooa extremely fast!!!
+
+
+main = putStrLn "main"
