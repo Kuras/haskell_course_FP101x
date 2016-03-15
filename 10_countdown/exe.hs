@@ -76,7 +76,8 @@ prop_splitapp          :: Int -> [Int] -> Bool
 prop_splitapp x ys     = split' (x:ys) == putFirst x (split'(ys))
 
 prop_splitapp'        :: [Int] -> Bool
-prop_splitapp' xs     = foldr (&&) True (map (\ tuple -> (fst tuple ++ snd tuple) == xs) (split' xs))
+prop_splitapp' xs     = foldr (&&) True (checkFuzEleProp xs (split' xs))
+                            where checkFuzEleProp xs = map (\ tuple -> (fst tuple ++ snd tuple) == xs)
 
 main :: IO ()
 main = do 
