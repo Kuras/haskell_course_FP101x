@@ -47,7 +47,7 @@ So from mathematicaly induction we have, let's
 Then 
 reverse ([x_1..x_n] ++ [x_n+1]) == reverse ((reverse [x_n..x_1]) ++ [x_n+1]) == reverse [x_n+1] ++ reverse ((reverse [x_n..x_1]))
 
-Maybe instead proof property for all posible value we are going run rundom 100 tests for that!!!
+Maybe instead doing the proof property for all posible value we are going run rundom 100 tests for that!!!
  => (reverse , ++) => 
         => Quick Check (reverse , ++)
 -} 
@@ -78,6 +78,11 @@ prop_splitapp x ys     = split' (x:ys) == putFirst x (split'(ys))
 prop_splitapp'        :: [Int] -> Bool
 prop_splitapp' xs     = foldr (&&) True (checkFuzEleProp xs (split' xs))
                             where checkFuzEleProp xs = map (\ tuple -> (fst tuple ++ snd tuple) == xs)
+
+-- So first of all we must:
+--  i)  Find property (I think the hardes one of all)
+--  ii) Express property
+--  iii)And write test
 
 main :: IO ()
 main = do 
