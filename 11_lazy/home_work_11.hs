@@ -43,11 +43,11 @@ loop = tail loop
 -- fst (1, loop)= 1
 -- This strategy does terminate
 
--- From first exe
+-- I) From first exe
 --      If E terminate seq(3+4->7) => 
 --            outermost terminate. The same result
 
--- From snd exe
+-- I) From snd exe
 --      If outermost terminate => 
 --            innermost may not terminate!
 
