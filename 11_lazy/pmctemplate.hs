@@ -7,45 +7,56 @@ import Control.Monad
 import qualified Control.Applicative as CA
 
 data Concurrent a = Concurrent ((a -> Action) -> Action)
--- Suspend
---      => grab "future" and use then
---          imp : continuation => (a -> Action) -> Action
-
 -- (a -> Action) -> Action into a monad
---      Concurrent a < trival algebracic data type
 --      ignoring bottoms -> data
 
+{-
+> newtype Parser a = P (String -> [(a,String)])
+> item                          :: Parser Char
+> item                          =  P (\inp -> case inp of
+>                                                []     -> []
+>                                                (x:xs) -> [(x,xs)])
+-}
 
 data Action = Atom (IO Action) | Fork Action Action | Stop
 
--- Atom -> primitive action
--- Fork -> concurrent exe of two action
--- Stop -> terminated action
 instance Show Action where
     show (Atom x) = "atom"
     show (Fork x y) = "fork " ++ show x ++ " " ++ show y
     show Stop = "stop"
 
-
--- ignoring the wrapper "Concurrent" (think like a fundamentalist)
---      then add pattern matching and constructor
 -- ===================================
--- Ex. 0
--- ===================================
-
--- connection bet. Types <- morphism
 {-
-((a -> Action) -> Action)  -> trnsform -> Action
+((a -> Action) -> Action)  -> (morphism)transform(connection) -> Action
 -}
-action :: Concurrent a -> Action
-action = error "You have to implement action"
+
+{-
+Stop :: Action
+\ a-> Stop :: r -> Action
+const Stop :: b -> Action
+
+const Stop (const Stop (const Stop (const Stop (const Stop (const Stop (3+4))))))
+const Stop (const Stop )
+(a -> Action) -> Action
+=>
+((a -> Action) -> Action) -> Action
+const Stop (const Stop (const Stop ))
+-}
+ma                  :: (a -> Action) -> Action
+ma f                 = (const Stop f)
 
 action'             :: ((a -> Action) -> Action) -> Action 
-action'             = \inp -> case inp of
-                                \inp -> case inp of
-                                        Stop        -> Stop
+action' ma            = (ma (const Stop))
 
-
+{-
+ma in this specyfic context means 
+ma = (a -> Action) -> Action
+test
+instance Show (Concurrent x) where
+    show (Concurrent x) = show x
+-}
+action :: Concurrent a -> Action
+action (Concurrent ma) = ma (const Stop) 
 
 -- ===================================
 -- Ex. 1
