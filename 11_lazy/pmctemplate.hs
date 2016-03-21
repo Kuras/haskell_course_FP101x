@@ -60,12 +60,26 @@ action (Concurrent ma) = ma (const Stop)
 
 -- ===================================
 -- Ex. 1
+-- - helper functions!!!
+-- => easy accesabel
+--      for me (in console)
+--          Stop
+--      for another fun's
+--          action (Concurrent (\_ ->Stop))
+--          action stop
+
 -- ===================================
-
+-- i) Think like fundementalist
+stop'   :: (a -> Action) -> Action
+stop'   = const Stop
+-- ii) Wraped in Monad
 stop :: Concurrent a
-stop = error "You have to implement stop"
+stop = Concurrent (const Stop)
 
-
+{- use
+action' stop'
+action stop
+-}
 -- ===================================
 -- Ex. 2
 -- ===================================
