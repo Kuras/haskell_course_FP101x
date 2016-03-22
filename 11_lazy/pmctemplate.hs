@@ -73,6 +73,7 @@ action (Concurrent ma) = ma (const Stop)
 stop'   :: (a -> Action) -> Action
 stop'   = const Stop
 -- ii) Wraped in Monad
+-- Program like hacker
 stop :: Concurrent a
 stop = Concurrent (const Stop)
 
