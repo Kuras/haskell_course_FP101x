@@ -85,6 +85,10 @@ action stop
 -- Ex. 2
 -- ===================================
 
+atom' :: IO a -> ((a -> Action) -> Action)
+
+atom' ma = ma >>= \a -> Atom (return a) 
+
 atom :: IO a -> Concurrent a
 atom = error "You have to implement atom"
 
