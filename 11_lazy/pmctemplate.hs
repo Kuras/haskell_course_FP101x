@@ -73,7 +73,6 @@ action (Concurrent ma) = ma (const Stop)
 stop'   :: (a -> Action) -> Action
 stop'   = const Stop
 -- ii) Wraped in Monad
--- Program like Lamer
 stop :: Concurrent a
 stop = Concurrent (const Stop)
 
@@ -91,7 +90,37 @@ atom = error "You have to implement atom"
 
 -- ===================================
 -- Ex. 3
+{-
+Fork
+    <- accses
+            fork arguments
+                i) an action
+                ii)input continuation ()
+    <- par
+            combines 2 computations
+    
+Fork Stop (Atom (return Stop))
+t0 -> a0
+\x -> 1
+
+how to modyfie to input fun
+(a0 -> t0) -> t0)
+\x -> (x 1)
+
+and now easy to make
+(() -> t0) -> t0)
+\x -> (x ())
+-}
 -- ===================================
+
+fork'       :: ((a -> Action) -> Action) -> ((() -> Action) -> Action)
+
+-- so we wona use Fork constructor so
+-- fork' = Fork
+fork' ma    = (\x -> Fork (action' ma) (x ()))
+
+-- fork' (const Stop)
+-- Show ((() -> Action) -> Action)
 
 fork :: Concurrent a -> Concurrent ()
 fork = error "You have to implement fork"
