@@ -84,8 +84,8 @@ action stop
 -- Ex. 2
 -- ===================================
 
-atom :: IO a -> Concurrent a
-atom = error "You have to implement atom"
+atom        :: IO a -> Concurrent a
+atom ioa    = Concurrent (\c -> Atom (ioa >>= \a -> return (c a)))
 
 
 -- ===================================
@@ -113,20 +113,20 @@ and now easy to make
 -}
 -- ===================================
 
-fork'       :: ((a -> Action) -> Action) -> ((() -> Action) -> Action)
-
 -- so we wona use Fork constructor so
 -- fork' = Fork
-fork' ma    = (\x -> Fork (action' ma) (x ()))
-
 -- fork' (const Stop)
 -- Show ((() -> Action) -> Action)
 
-fork :: Concurrent a -> Concurrent ()
-fork = error "You have to implement fork"
 
-par :: Concurrent a -> Concurrent a -> Concurrent a
-par = error "You have to implement par"
+fork'       :: ((a -> Action) -> Action) -> ((() -> Action) -> Action)
+fork' ma    = (\x -> Fork (action' ma) (x ()))
+
+fork        :: Concurrent a -> Concurrent ()
+fork ca     = Concurrent (\x -> Fork (action ca) (x ()))
+
+par         :: Concurrent a -> Concurrent a -> Concurrent a
+par ca cb   = Concurrent (\x -> Fork (action ca) (action cb))
 
 
 -- ===================================
