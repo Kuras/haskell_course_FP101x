@@ -98,6 +98,7 @@ Fork
                 ii)input continuation ()
     <- par
             combines 2 computations
+                -> Using Fork data constructor
     
 Fork Stop (Atom (return Stop))
 t0 -> a0
