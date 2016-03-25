@@ -85,12 +85,17 @@ action stop
 -- Ex. 2
 -- ===================================
 
-atom' :: IO a -> ((a -> Action) -> Action)
+atom' :: IO a -> Action
+atom' x = Atom (return (Stop))
 
-atom' ma = ma >>= \a -> Atom (return a) 
+atom'' :: IO a -> (a -> Action)
+atom'' x = \c -> Atom (return (Stop))
 
-atom :: IO a -> Concurrent a
-atom = error "You have to implement atom"
+atom''' :: IO a -> ((a -> Action) -> Action)
+atom''' x = \c -> Atom ( x >>= \a -> return (c a))
+
+atom        :: IO a -> Concurrent a
+atom x      = Concurrent (\c -> Atom ( x >>= \a -> return (c a)))
 
 
 -- ===================================
