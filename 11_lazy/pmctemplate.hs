@@ -133,6 +133,7 @@ par ca cb   = Concurrent (\x -> Fork (action ca) (action cb))
 -- ===================================
 -- Ex. 4
 -- Don't try to understand what the code does operationally, trust the types.
+-- Haskell only let you done things: "just one way to wire up all the pieces"
 -- ===================================
 
 {-
@@ -160,6 +161,13 @@ bind ma f = \t -> (ma (\a -> (f a) t))
 -- so
 -- case g a of
 --          Concurrent x -> x  <- take value out
+
+{-
+add the boilerplate pattern matching
+    case g a of
+applications of Concurrent
+    Concurrent ()
+-}
 instance Monad Concurrent where
     (Concurrent f) >>= g = Concurrent(\t -> (f (\a -> case g a of
                                                             Concurrent x -> x t)))
@@ -175,8 +183,13 @@ instance CA.Applicative Concurrent where
 -- Ex. 5
 -- ===================================
 
-roundRobin :: [Action] -> IO ()
-roundRobin = error "You have to implement roundRobin"
+roundRobin          :: [Action] -> IO ()
+roundRobin []       = return ()
+roundRobin (x:xs)   = case x of
+                            Atom a      -> roundRobin (xs ++ ([action . atom $ a]))
+                            Fork a b    -> roundRobin (xs ++ [a,b])
+                            Stop        -> roundRobin xs    
+                            
 
 -- ===================================
 -- Tests
