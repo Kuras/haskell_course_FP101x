@@ -132,10 +132,37 @@ par ca cb   = Concurrent (\x -> Fork (action ca) (action cb))
 
 -- ===================================
 -- Ex. 4
+-- Don't try to understand what the code does operationally, trust the types.
 -- ===================================
 
+{-
+ma :: ((a -> Action) -> Action)
+f  :: (a -> ((b -> Action) -> Action))
+
+create value/result of tyoe
+((b -> Action) -> Action)
+-}
+{-
+\c -> ... expression of type Action ...                     :: ((b -> Action) -> Action)
+\a -> ... expression of type ((b -> Action) -> Action) ...  :: a -> ((b -> Action) -> Action)
+
+z :: Num a => a -> a -> a
+z =  \x ->(\z -> z+x+1)
+-}
+
+bind :: ((a -> Action) -> Action) -> (a -> ((b -> Action) -> Action)) -> ((b -> Action) -> Action)
+bind ma f = \t -> (ma (\a -> (f a) t))
+
+-- bad 
+-- (Concurrent f) >>= g = Concurrent(\t -> (f (\a -> (action(g a)) t)))
+
+-- g a :: a -> Concurrent a
+-- so
+-- case g a of
+--          Concurrent x -> x  <- take value out
 instance Monad Concurrent where
-    (Concurrent f) >>= g = error "You have to implement >>="
+    (Concurrent f) >>= g = Concurrent(\t -> (f (\a -> case g a of
+                                                            Concurrent x -> x t)))
     return x = Concurrent (\c -> c x)
 
 
