@@ -19,7 +19,7 @@ data Concurrent a = Concurrent ((a -> Action) -> Action)
 -}
 
 data Action = Atom (IO Action) | Fork Action Action | Stop
-
+    
 instance Show Action where
     show (Atom x) = "atom"
     show (Fork x y) = "fork " ++ show x ++ " " ++ show y
@@ -186,13 +186,18 @@ instance CA.Applicative Concurrent where
 roundRobin          :: [Action] -> IO ()
 roundRobin []       = return ()
 roundRobin (x:xs)   = case x of
-                            Atom a      -> roundRobin (xs ++ ([action . atom $ a]))
+                            Atom a      -> do { a' <- a; roundRobin (xs ++ [a']) }
                             Fork a b    -> roundRobin (xs ++ [a,b])
                             Stop        -> roundRobin xs    
                             
 
 -- ===================================
 -- Tests
+
+--  Run our Concurrent Monad
+--     It is now time to put everything together 
+
+
 -- ===================================
 
 ex0 :: Concurrent ()
@@ -220,4 +225,6 @@ genRandom 42   = [71, 71, 17, 14, 16, 91, 18, 71, 58, 75]
 
 loop :: [Int] -> Concurrent ()
 loop xs = mapM_ (atom . putStr . show) xs
+
+-- Exercise 24 --
 
