@@ -226,5 +226,31 @@ genRandom 42   = [71, 71, 17, 14, 16, 91, 18, 71, 58, 75]
 loop :: [Int] -> Concurrent ()
 loop xs = mapM_ (atom . putStr . show) xs
 
--- Exercise 24 --
+-- Exercise ... --
+-- run $ atom (putStrLn "a") >> atom (putStrLn "b") >> atom (putStrLn "c")
 
+-- putStrLn "a" >> putStrLn "b"  :: ()
+ex2 :: Concurrent ()
+ex2 = h "a" >> h "b" >> h "c"
+        >> atom (putStrLn "")
+            where h s = atom (putStr s)
+            
+ex3 :: Concurrent ()
+ex3 = fork (h "a'" >> h "b'" >> h "c'")
+        >> (h "a" >> h "b" >> h "c")
+        >> atom (putStrLn "")
+            where h s = atom (putStr s)
+            
+ex4 :: Concurrent ()
+ex4 =      (h "a" >> h "b" >> h "c")
+        >> (h "a" >> h "b" >> h "c")
+        >> atom (putStrLn "")
+            where h s = atom (putStr s)
+            
+ex5 :: Concurrent ()
+ex5 = par  (h "a'" >> h "b'" >> h "c'")
+           (h "a" >> h "b" >> h "c")
+        >> h ""
+        >> h "..."
+        >> h "end"
+            where h s = atom (putStr s)
