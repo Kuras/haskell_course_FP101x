@@ -19,7 +19,7 @@ data Concurrent a = Concurrent ((a -> Action) -> Action)
 -}
 
 data Action = Atom (IO Action) | Fork Action Action | Stop
-
+    
 instance Show Action where
     show (Atom x) = "atom"
     show (Fork x y) = "fork " ++ show x ++ " " ++ show y
@@ -93,7 +93,7 @@ atom''' :: IO a -> ((a -> Action) -> Action)
 atom''' x = \c -> Atom ( x >>= \a -> return (c a))
 
 atom        :: IO a -> Concurrent a
-atom x      = Concurrent (\c -> Atom ( x >>= \a -> return (c a)))
+atom ioa    = Concurrent (\c -> Atom (ioa >>= \a -> return (c a)))
 
 
 -- ===================================
@@ -106,6 +106,7 @@ Fork
                 ii)input continuation ()
     <- par
             combines 2 computations
+                -> Using Fork data constructor
     
 Fork Stop (Atom (return Stop))
 t0 -> a0
@@ -121,28 +122,63 @@ and now easy to make
 -}
 -- ===================================
 
-fork'       :: ((a -> Action) -> Action) -> ((() -> Action) -> Action)
-
 -- so we wona use Fork constructor so
 -- fork' = Fork
-fork' ma    = (\x -> Fork (action' ma) (x ()))
-
 -- fork' (const Stop)
 -- Show ((() -> Action) -> Action)
 
-fork :: Concurrent a -> Concurrent ()
-fork = error "You have to implement fork"
 
-par :: Concurrent a -> Concurrent a -> Concurrent a
-par = error "You have to implement par"
+fork'       :: ((a -> Action) -> Action) -> ((() -> Action) -> Action)
+fork' ma    = (\x -> Fork (action' ma) (x ()))
+
+fork        :: Concurrent a -> Concurrent ()
+fork ca     = Concurrent (\x -> Fork (action ca) (x ()))
+
+par         :: Concurrent a -> Concurrent a -> Concurrent a
+par ca cb   = Concurrent (\x -> Fork (action ca) (action cb))
 
 
 -- ===================================
 -- Ex. 4
+-- Don't try to understand what the code does operationally, trust the types.
+-- Haskell only let you done things: "just one way to wire up all the pieces"
 -- ===================================
 
+{-
+ma :: ((a -> Action) -> Action)
+f  :: (a -> ((b -> Action) -> Action))
+
+create value/result of tyoe
+((b -> Action) -> Action)
+-}
+{-
+\c -> ... expression of type Action ...                     :: ((b -> Action) -> Action)
+\a -> ... expression of type ((b -> Action) -> Action) ...  :: a -> ((b -> Action) -> Action)
+
+z :: Num a => a -> a -> a
+z =  \x ->(\z -> z+x+1)
+-}
+
+bind :: ((a -> Action) -> Action) -> (a -> ((b -> Action) -> Action)) -> ((b -> Action) -> Action)
+bind ma f = \t -> (ma (\a -> (f a) t))
+
+-- bad 
+-- (Concurrent f) >>= g = Concurrent(\t -> (f (\a -> (action(g a)) t)))
+
+-- g a :: a -> Concurrent a
+-- so
+-- case g a of
+--          Concurrent x -> x  <- take value out
+
+{-
+add the boilerplate pattern matching
+    case g a of
+applications of Concurrent
+    Concurrent ()
+-}
 instance Monad Concurrent where
-    (Concurrent f) >>= g = error "You have to implement >>="
+    (Concurrent f) >>= g = Concurrent(\t -> (f (\a -> case g a of
+                                                            Concurrent x -> x t)))
     return x = Concurrent (\c -> c x)
 
 
@@ -155,11 +191,21 @@ instance CA.Applicative Concurrent where
 -- Ex. 5
 -- ===================================
 
-roundRobin :: [Action] -> IO ()
-roundRobin = error "You have to implement roundRobin"
+roundRobin          :: [Action] -> IO ()
+roundRobin []       = return ()
+roundRobin (x:xs)   = case x of
+                            Atom a      -> do { a' <- a; roundRobin (xs ++ [a']) }
+                            Fork a b    -> roundRobin (xs ++ [a,b])
+                            Stop        -> roundRobin xs    
+                            
 
 -- ===================================
 -- Tests
+
+--  Run our Concurrent Monad
+--     It is now time to put everything together 
+
+
 -- ===================================
 
 ex0 :: Concurrent ()
@@ -188,3 +234,31 @@ genRandom 42   = [71, 71, 17, 14, 16, 91, 18, 71, 58, 75]
 loop :: [Int] -> Concurrent ()
 loop xs = mapM_ (atom . putStr . show) xs
 
+-- Exercise ... --
+-- run $ atom (putStrLn "a") >> atom (putStrLn "b") >> atom (putStrLn "c")
+
+-- putStrLn "a" >> putStrLn "b"  :: ()
+ex2 :: Concurrent ()
+ex2 = h "a" >> h "b" >> h "c"
+        >> atom (putStrLn "")
+            where h s = atom (putStr s)
+            
+ex3 :: Concurrent ()
+ex3 = fork (h "a'" >> h "b'" >> h "c'")
+        >> (h "a" >> h "b" >> h "c")
+        >> atom (putStrLn "")
+            where h s = atom (putStr s)
+            
+ex4 :: Concurrent ()
+ex4 =      (h "a" >> h "b" >> h "c")
+        >> (h "a" >> h "b" >> h "c")
+        >> atom (putStrLn "")
+            where h s = atom (putStr s)
+            
+ex5 :: Concurrent ()
+ex5 = par  (h "a'" >> h "b'" >> h "c'")
+           (h "a" >> h "b" >> h "c")
+        >> h ""
+        >> h "..."
+        >> h "end"
+            where h s = atom (putStr s)
