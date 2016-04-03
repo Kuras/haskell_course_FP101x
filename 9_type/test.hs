@@ -87,7 +87,7 @@ data Nat = Zero | Succ Nat
 -- Zero::Nat
 -- Succ::Nat -> Nat
 
--- Bottom = undefined
+-- Bottom = undefined (not care of the bottom)
 -- Zero
 -- Succ Zero
 -- Succ (SuccZero)
@@ -174,10 +174,11 @@ flatten (Node l n r)    = flatten l
                           ++ [n]
                           ++ flatten r
 
--- tree is 'search tree' 
+ 
 {-
-<=>
-    flatten -> sorted list
+tree is 'search tree'
+    <=>
+        flatten -> sorted list
 -}
 
 occurs' m (Leaf n)       = m==n
