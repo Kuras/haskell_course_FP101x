@@ -15,12 +15,15 @@ data Rose a = a :> [Rose a] deriving Show
 -- ===================================
 -- Ex. 0-2
 -- ===================================
+-- root (1 :> [2 :> [], 3 :> []]) = 1
 
-root :: Rose a -> a 
-root = error "you have to implement root" 
+root            :: Rose a -> a 
+root (x:>xs)    = x 
 
-children :: Rose a -> [Rose a]
-children = error "you have to implement children"
+children            :: Rose a -> [Rose a]
+children (x:>xs)    = xs
+
+tree = 'x' :> map (flip (:>) []) ['a'..'x']
 
 xs = 0 :> [1 :> [2 :> [3 :> [4 :> [], 5 :> []]]], 6 :> [], 7 :> [8 :> [9 :> [10 :> []], 11 :> []], 12 :> [13 :> []]]]
 
