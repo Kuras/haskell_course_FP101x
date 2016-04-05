@@ -32,6 +32,9 @@ The monad of parsers
 >                                                   []        -> parse q inp
 >                                                   [(v,out)] -> [(v,out)])
 
+use case
+parse item "Jan" >>= (\s -> parse item (snd (s) ++ " niezbedny"))
+
 Basic parsers
 -------------
 
@@ -51,6 +54,9 @@ Choice
 
 > (+++)                         :: Parser a -> Parser a -> Parser a
 > p +++ q                       =  p `mplus` q
+
+use case
+parse (item +++ return 'a') "hello"
 
 Derived primitives
 ------------------

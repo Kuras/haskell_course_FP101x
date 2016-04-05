@@ -24,6 +24,7 @@ children            :: Rose a -> [Rose a]
 children (x:>xs)    = xs
 
 tree = 'x' :> map (flip (:>) []) ['a'..'x']
+tree' = 'x' :> map (\c -> c :> []) ['a'..'A']
 
 xs = 0 :> [1 :> [2 :> [3 :> [4 :> [], 5 :> []]]], 6 :> [], 7 :> [8 :> [9 :> [10 :> []], 11 :> []], 12 :> [13 :> []]]]
 
@@ -33,8 +34,11 @@ ex2 = root . head . children . head . children . head . drop 2 $ children xs
 -- Ex. 3-7
 -- ===================================
 
-size :: Rose a -> Int
-size = error "you have to implement size"
+size              :: Rose a -> Int
+-- size []       = 0
+size (x:>xs)  
+    | (_:>[]) ->  1
+    | () 
 
 leaves :: Rose a -> Int
 leaves = error "you have to implement leaves"
