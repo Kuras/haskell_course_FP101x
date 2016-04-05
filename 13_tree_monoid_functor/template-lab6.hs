@@ -35,10 +35,9 @@ ex2 = root . head . children . head . children . head . drop 2 $ children xs
 -- ===================================
 
 size              :: Rose a -> Int
--- size []       = 0
-size (x:>xs)  
-    | (_:>[]) ->  1
-    | () 
+size (x:>xs) = 1 + case xs of
+                        []          -> 0
+                        otherwise   -> foldl (+) 0 (map (\z -> size z) xs)  
 
 leaves :: Rose a -> Int
 leaves = error "you have to implement leaves"
