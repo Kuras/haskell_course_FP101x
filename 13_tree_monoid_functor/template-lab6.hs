@@ -84,7 +84,36 @@ f r = fmap head $ fmap (\x -> [x]) r
 -- ===================================
 -- Ex. 11-13
 -- ===================================
+{-
+m type 
+instantiate m to []
 
+instance Monoid [] where
+  mempty = []
+  xs `mappend` ys = xs ++ ys
+  
+algebraic structure
+ over type m 
+ 
+(++) is an associative operation
+(xs ++ ys) ++ zs = xs ++ (ys ++ zs)
+    ->induction over structure list xs 
+    (i)  base case
+            [] ++ (xs ++ ys) = xs ++ ys = ([] ++ xs) ++ ys
+    (ii) hipotise
+            [(x:xs) ++ ys = x:(xs ++ ys)]
+            Let (xs ++ ys) ++ zs = xs ++ (ys ++ zs)
+            Then (x:xs) ++ (ys ++ zs) =
+                 x:(xs ++ (ys ++ zs)) =
+                 x:((xs ++ ys) ++ zs) =
+                 (x:(xs ++ ys)) ++ zs   =
+                 ((x:xs) ++ ys) ++ zs
+            
+[] is indeed an identity element (++)
+    ls, [] ++ ls = ls and ls ++ [] = ls
+    Reductio ad absurdum
+    
+-}
 class Monoid m where
   mempty :: m
   mappend :: m -> m -> m
