@@ -34,13 +34,15 @@ ex2 = root . head . children . head . children . head . drop 2 $ children xs
 -- Ex. 3-7
 -- ===================================
 
-size              :: Rose a -> Int
-size (x:>xs) = 1 + case xs of
+size            :: Rose a -> Int
+size (x:>xs)    = 1 + case xs of
                         []          -> 0
                         otherwise   -> foldl (+) 0 (map (\z -> size z) xs)  
 
-leaves :: Rose a -> Int
-leaves = error "you have to implement leaves"
+leaves          :: Rose a -> Int
+leaves (x:>xs)  = case xs of
+                        []          -> 1
+                        otherwise   -> foldl (+) 0 (map (\z -> leaves z) xs)  
 
 ex7 = (*) (leaves . head . children . head . children $ xs) (product . map size . children . head . drop 2 . children $ xs)
 
