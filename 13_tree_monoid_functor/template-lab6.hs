@@ -48,12 +48,38 @@ ex7 = (*) (leaves . head . children . head . children $ xs) (product . map size 
 
 -- ===================================
 -- Ex. 8-10
--- ===================================
+-- apply a function uniformly to all elements in a list
+--  map
 
+-- apply a function uniformly to all the elements in a rose tree
+
+-- apply a function uniformly to all the elements in data structure
+--          => Functor type class
+{-
+    fmap that generalizes the map
+    instance Functor [] where
+        fmap = map
+    
+    class Functor f where 
+        fmap :: (a -> b) -> f a -> f b
+            
+        -> instantiate f to []
+-}
+-- ===================================
+-- instantiate Rose to (x:>xs)
+-- a :> [Rose a]
+-- use case
+-- fmap (*2) (1:>[1:>[],1:>[],1:>[]])
 instance Functor Rose where
-  fmap = error "you have to implement fmap for Rose"
+  fmap f (x:>xs) = case xs of
+                        []          -> (f x) :> []
+                        otherwise   -> (f x) :> (map (\z -> fmap f z) xs)
 
 ex10 = round . root . head . children . fmap (\x -> if x > 0.5 then x else 0) $ fmap (\x -> sin(fromIntegral x)) xs
+
+-- Exercise 9
+-- \Why Rose a -> Rose b
+f r = fmap head $ fmap (\x -> [x]) r
 
 -- ===================================
 -- Ex. 11-13
