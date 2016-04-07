@@ -119,6 +119,22 @@ class Monoid m where
   mempty :: m
   mappend :: m -> m -> m
 
+-- Numbers also form a Monoid
+{-
+mempty = 0
+x `mappend` y = x + y
+    *addition with 0
+    a = a + 0 = 0 + a 
+    a + (b + c) = (a + b) + c 
+    *multiplication with 1
+    a = a * 1 = 1 * 0
+    a * (b * c) = (a * b) * c
+        where a,b,c::Numbers
+-} 
+-- one instance per combination 
+--      => two different types for numbers!!!
+-- of type  Sum
+--               and type class  Monoid 
 newtype Sum a = Sum a
 newtype Product a = Product a
 
