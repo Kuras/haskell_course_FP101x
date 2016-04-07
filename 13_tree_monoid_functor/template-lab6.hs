@@ -1,4 +1,4 @@
-------------------------------------------------------------------------------------------------------------------------------
+﻿------------------------------------------------------------------------------------------------------------------------------
 -- ROSE TREES, FUNCTORS, MONOIDS, FOLDABLES
 ------------------------------------------------------------------------------------------------------------------------------
 import Prelude hiding (Monoid, Foldable, mappend, mempty, foldMap)
@@ -35,29 +35,86 @@ ex2 = root . head . children . head . children . head . drop 2 $ children xs
 -- ===================================
 -- easy steps !
 --    baby steps
-size              :: Rose a -> Int
-size (x:>xs) = 1 + case xs of
+size            :: Rose a -> Int
+size (x:>xs)    = 1 + case xs of
                         []          -> 0
                         otherwise   -> foldl (+) 0 (map (\z -> size z) xs)  
 
-leaves :: Rose a -> Int
-leaves = error "you have to implement leaves"
+leaves          :: Rose a -> Int
+leaves (x:>xs)  = case xs of
+                        []          -> 1
+                        otherwise   -> foldl (+) 0 (map (\z -> leaves z) xs)  
 
 ex7 = (*) (leaves . head . children . head . children $ xs) (product . map size . children . head . drop 2 . children $ xs)
 
 -- ===================================
 -- Ex. 8-10
--- ===================================
+-- apply a function uniformly to all elements in a list
+--  map
 
+-- apply a function uniformly to all the elements in a rose tree
+
+-- apply a function uniformly to all the elements in data structure
+--          => Functor type class
+{-
+    fmap that generalizes the map
+    instance Functor [] where
+        fmap = map
+    
+    class Functor f where 
+        fmap :: (a -> b) -> f a -> f b
+            
+        -> instantiate f to []
+-}
+-- ===================================
+-- instantiate Rose to (x:>xs)
+-- a :> [Rose a]
+-- use case
+-- fmap (*2) (1:>[1:>[],1:>[],1:>[]])
 instance Functor Rose where
-  fmap = error "you have to implement fmap for Rose"
+  fmap f (x:>xs) = case xs of
+                        []          -> (f x) :> []
+                        otherwise   -> (f x) :> (map (\z -> fmap f z) xs)
 
 ex10 = round . root . head . children . fmap (\x -> if x > 0.5 then x else 0) $ fmap (\x -> sin(fromIntegral x)) xs
+
+-- Exercise 9
+-- \Why Rose a -> Rose b
+f r = fmap head $ fmap (\x -> [x]) r
 
 -- ===================================
 -- Ex. 11-13
 -- ===================================
+{-
+m type 
+instantiate m to []
 
+instance Monoid [] where
+  mempty = []
+  xs `mappend` ys = xs ++ ys
+  
+algebraic structure
+ over type m 
+ 
+(++) is an associative operation
+(xs ++ ys) ++ zs = xs ++ (ys ++ zs)
+    ->induction over structure list xs 
+    (i)  base case
+            [] ++ (xs ++ ys) = xs ++ ys = ([] ++ xs) ++ ys
+    (ii) hipotise
+            [(x:xs) ++ ys = x:(xs ++ ys)]
+            Let (xs ++ ys) ++ zs = xs ++ (ys ++ zs)
+            Then (x:xs) ++ (ys ++ zs) =
+                 x:(xs ++ (ys ++ zs)) =
+                 x:((xs ++ ys) ++ zs) =
+                 (x:(xs ++ ys)) ++ zs   =
+                 ((x:xs) ++ ys) ++ zs
+            
+[] is indeed an identity element (++)
+    ls, [] ++ ls = ls and ls ++ [] = ls
+    Reductio ad absurdum
+    
+-}
 class Monoid m where
   mempty :: m
   mappend :: m -> m -> m
