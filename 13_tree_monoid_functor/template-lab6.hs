@@ -1,4 +1,4 @@
-﻿------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------
 -- ROSE TREES, FUNCTORS, MONOIDS, FOLDABLES
 ------------------------------------------------------------------------------------------------------------------------------
 import Prelude hiding (Monoid, Foldable, mappend, mempty, foldMap)
@@ -139,17 +139,17 @@ newtype Sum a = Sum a
 newtype Product a = Product a
 
 instance Num a => Monoid (Sum a) where
-  mempty = error "you have to implement mempty for Sum"
-  mappend = error "you have to implement mappend for Sum"
+  mempty = Sum 0
+  a `mappend` b = Sum (unSum a + unSum b)
   
 instance Num a => Monoid (Product a) where
-  mempty = error "you have to implement mempty for Product"
-  mappend = error "you have to implement mappend for Product"
+  mempty = Product 1
+  a `mappend` b = Product (unProduct a * unProduct b)
 
-unSum :: Sum a -> a
-unSum = error "you have to implement unSum"
-unProduct :: Product a -> a
-unProduct = error "you have to implement unProduct"
+unSum                   :: Sum a -> a
+unSum (Sum a)           = a
+unProduct               :: Product a -> a
+unProduct (Product a)   = a
 
 num1 = mappend (mappend (Sum 2) (mappend (mappend mempty (Sum 1)) mempty)) (mappend (Sum 2) (Sum 1))
   
