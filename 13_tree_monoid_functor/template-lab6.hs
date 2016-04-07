@@ -33,7 +33,8 @@ ex2 = root . head . children . head . children . head . drop 2 $ children xs
 -- ===================================
 -- Ex. 3-7
 -- ===================================
-
+-- easy steps !
+--    baby steps
 size              :: Rose a -> Int
 size (x:>xs) = 1 + case xs of
                         []          -> 0
