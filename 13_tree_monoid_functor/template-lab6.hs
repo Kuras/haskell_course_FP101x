@@ -73,8 +73,8 @@ ex7 = (*) (leaves . head . children . head . children $ xs) (product . map size 
 -- fmap (*2) (1:>[1:>[],1:>[],1:>[]])
 instance Functor Rose where
   fmap f (x:>xs) = case xs of
-                        []          -> (f x) :> []
-                        otherwise   -> (f x) :> (map (\z -> fmap f z) xs)
+                        []  -> (f x) :> []
+                        _   -> (f x) :> (map (\z -> fmap f z) xs)
 
 ex10 = round . root . head . children . fmap (\x -> if x > 0.5 then x else 0) $ fmap (\x -> sin(fromIntegral x)) xs
 
@@ -135,8 +135,8 @@ x `mappend` y = x + y
 --      => two different types for numbers!!!
 -- of type  Sum
 --               and type class  Monoid 
-newtype Sum a = Sum a
-newtype Product a = Product a
+newtype Sum a = Sum a deriving Show
+newtype Product a = Product a deriving Show
 
 instance Num a => Monoid (Sum a) where
   mempty = Sum 0
