@@ -160,14 +160,34 @@ ex13 = unSum (mappend (Sum 5) (Sum (unProduct (mappend (Product (unSum num2)) (m
 -- ===================================
 -- Ex. 14-15
 -- ===================================
+{-
+instance Functor [] where
+  fmap = map
+instance Foldable [] where
+  fold = foldr (mappend) mempty
+
+f == container
+       data structure : eles of type : m
+       m form a Monoid
+          => exist : folding all eles -> ele : m
+
+=>  Foldable : type class 
+-}
 
 class Functor f => Foldable f where
   fold :: Monoid m => f m -> m
   foldMap :: Monoid m => (a -> m) -> (f a -> m)
   foldMap = error "you have to implement foldMap"
-  
+ 
+{-
+steps:
+(i) fold ( (Sum 1) :> map (flip (:>) []) [Sum 2, Sum 3] )
+
+-} 
 instance Foldable Rose where
-  fold = error "you have to implement fold for Rose"
+  fold (x:>xs) = case xs of
+                        []  -> x
+                        -- _   -> map (\s -> unSum s) xs 
   
 sumxs = Sum 0 :> [Sum 13 :> [Sum 26 :> [Sum (-31) :> [Sum (-45) :> [], Sum 23 :> []]]], Sum 27 :> [], Sum 9 :> [Sum 15 :> [Sum 3 :> [Sum (-113) :> []], Sum 1 :> []], Sum 71 :> [Sum 55 :> []]]]
 
