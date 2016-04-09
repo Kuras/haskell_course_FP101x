@@ -23,7 +23,11 @@ root (x:>xs)    = x
 children            :: Rose a -> [Rose a]
 children (x:>xs)    = xs
 
+construct = flip (:>) []
+
 tree = 'x' :> map (flip (:>) []) ['a'..'x']
+-- function f^-1 
+tree1 = map (\(x:>xs) -> x) (map (flip (:>) []) ['a'..'x'])
 tree' = 'x' :> map (\c -> c :> []) ['a'..'A']
 
 xs = 0 :> [1 :> [2 :> [3 :> [4 :> [], 5 :> []]]], 6 :> [], 7 :> [8 :> [9 :> [10 :> []], 11 :> []], 12 :> [13 :> []]]]
@@ -171,7 +175,8 @@ f == container
        m form a Monoid
           => exist : folding all eles -> ele : m
 
-=>  Foldable : type class 
+=>  Foldable : type class
+fmap (\s -> mappend s (Sum 2)) (construct (Sum 2)) 
 -}
 
 class Functor f => Foldable f where
@@ -185,9 +190,8 @@ steps:
 
 -} 
 instance Foldable Rose where
-  fold (x:>xs) = case xs of
-                        []  -> x
-                        -- _   -> map (\s -> unSum s) xs 
+  fold (x:>xs) =
+    x `mappend` foldr mappend mempty (fmap (\(x:>xs) -> x) xs) 
   
 sumxs = Sum 0 :> [Sum 13 :> [Sum 26 :> [Sum (-31) :> [Sum (-45) :> [], Sum 23 :> []]]], Sum 27 :> [], Sum 9 :> [Sum 15 :> [Sum 3 :> [Sum (-113) :> []], Sum 1 :> []], Sum 71 :> [Sum 55 :> []]]]
 
