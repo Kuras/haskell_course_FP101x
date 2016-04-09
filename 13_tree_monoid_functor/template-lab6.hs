@@ -187,11 +187,14 @@ class Functor f => Foldable f where
 {-
 steps:
 (i) fold ( (Sum 1) :> map (flip (:>) []) [Sum 2, Sum 3] )
+(ii) using leaves impl
+leaves (x:>xs)  = case xs of
+                        []          -> 1
+                        otherwise   -> foldl (+) 0 (map (\z -> leaves z) xs)  
 
 -} 
 instance Foldable Rose where
-  fold (x:>xs) =
-    x `mappend` foldr mappend mempty (fmap (\(x:>xs) -> x) xs) 
+  fold (x:>xs) = x `mappend` foldr mappend mempty (fmap (\z -> fold z) xs)
   
 sumxs = Sum 0 :> [Sum 13 :> [Sum 26 :> [Sum (-31) :> [Sum (-45) :> [], Sum 23 :> []]]], Sum 27 :> [], Sum 9 :> [Sum 15 :> [Sum 3 :> [Sum (-113) :> []], Sum 1 :> []], Sum 71 :> [Sum 55 :> []]]]
 
