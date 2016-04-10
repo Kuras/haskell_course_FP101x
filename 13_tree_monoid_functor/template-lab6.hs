@@ -181,8 +181,9 @@ fmap (\s -> mappend s (Sum 2)) (construct (Sum 2))
 
 class Functor f => Foldable f where
   fold :: Monoid m => f m -> m
-  foldMap :: Monoid m => (a -> m) -> (f a -> m)
-  foldMap = error "you have to implement foldMap"
+  foldMap       :: Monoid m => (a -> m) -> (f a -> m)
+  -- Add a default implementation
+  foldMap h xs  = fold (fmap h xs)
  
 {-
 steps:
@@ -194,7 +195,7 @@ leaves (x:>xs)  = case xs of
 
 -} 
 instance Foldable Rose where
-  fold (x:>xs) = x `mappend` foldr mappend mempty (fmap (\z -> fold z) xs)
+  fold (x:>xs) = x `mappend` foldr (mappend) mempty (fmap (\z -> fold z) xs)
   
 sumxs = Sum 0 :> [Sum 13 :> [Sum 26 :> [Sum (-31) :> [Sum (-45) :> [], Sum 23 :> []]]], Sum 27 :> [], Sum 9 :> [Sum 15 :> [Sum 3 :> [Sum (-113) :> []], Sum 1 :> []], Sum 71 :> [Sum 55 :> []]]]
 
@@ -202,6 +203,13 @@ ex15 = unSum (mappend (mappend (fold sumxs) (mappend (fold . head . drop 2 . chi
 
 -- ===================================
 -- Ex. 16-18
+-- Monoid m => a -> m
+--  \x -> Sum x
+--  \x -> Product x
+-- foldMap 
+--  (i) transforms all the elements of the foldable into a Monoid
+--  (i) and then folds them into a single monoidal value.
+-- fold and fmap
 -- ===================================
 
 ex17 = unSum (mappend (mappend (foldMap (\x -> Sum x) xs) (mappend (foldMap (\x -> Sum x) . head . drop 2 . children $ xs) (Sum 30))) (foldMap (\x -> Sum x) . head . children $ xs))
@@ -213,8 +221,8 @@ ex18 = unSum (mappend (mappend (foldMap (\x -> Sum x) xs) (Sum (unProduct (mappe
 -- ===================================
 
 fproduct, fsum :: (Foldable f, Num a) => f a -> a
-fsum = error "you have to implement fsum"
-fproduct = error "you have to implement fproduct"
+fsum xs     = unSum (foldMap Sum xs)
+fproduct xs = unProduct (foldMap Product xs)
 
 ex21 = ((fsum . head . drop 1 . children $ xs) + (fproduct . head . children . head . children . head . drop 2 . children $ xs)) - (fsum . head . children . head . children $ xs)
 
