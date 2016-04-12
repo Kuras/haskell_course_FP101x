@@ -171,7 +171,7 @@ instance Foldable [] where
   fold = foldr (mappend) mempty
 
 f == container
-       data structure : eles of type : m
+       data structure : ele's of type : m
        m form a Monoid
           => exist : folding all eles -> ele : m
 
@@ -226,3 +226,33 @@ fproduct xs = unProduct (foldMap Product xs)
 
 ex21 = ((fsum . head . drop 1 . children $ xs) + (fproduct . head . children . head . children . head . drop 2 . children $ xs)) - (fsum . head . children . head . children $ xs)
 
+
+
+-- functors symbols --
+{-
+-- Functors --
+instance Functor IO where  
+    fmap f action = do  
+        result <- action  
+        return (f result) 
+-}
+-- (<$>) === fmap
+
+ex22 = (<$>) (*2) (xs)
+
+{-
+-- Applicative functors --
+Control.Applicative
+map (*2) [1,2,3,4]
+->
+  map (*) [1,2,3,4]  
+  fmap (\f -> f 9) (fmap (*) [1,2,3,4])
+-}
+app1 = (<*>) (fmap (+) (Just 3)) (Just 9)
+app2 = (<*>) (Just (+3)) (Just 9)
+
+
+--appn1  = (<*>) (\f -> f 9) (fmap (*) [1,2,3,4])
+-- map a function that's inside a functor over another functor
+-- general and abstract way -> works across functors.
+appn2  = (<*>) [(\f -> f 9)] (fmap (*) [1,2,3,4])

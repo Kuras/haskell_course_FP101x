@@ -10,3 +10,5 @@ foldl2 f a bs = foldr (\a b -> f b a) a bs
 foldl3 f = flip $ foldr (\a b g -> b (f g a)) id
 
 --foldl4 = foldr . flip
+
+-- Functors --
